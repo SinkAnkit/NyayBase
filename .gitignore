@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.next/
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment & secrets
+.env
+.env.local
+.env.production
+
+# Runtime logs
+server.log
+*.log
+
+# Context / session files (internal dev notes)
+nyay_base_context.md
+project_handover.md
+project_handover.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Build output
+dist/
+build/
+*.egg-info/

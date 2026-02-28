@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Crimson+Pro:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Deep navy/charcoal base */
+  --bg1: #080b16;
+  --bg2: #0e1525;
+  --bg-card: rgba(14, 21, 42, 0.65);
+  --bg-glass: rgba(12, 18, 36, 0.6);
+
+  /* Purple — Justice & Dignity */
+  --purple: #8b5cf6;
+  --purple-light: #a78bfa;
+  --purple-dark: #7c3aed;
+  --purple-glow: rgba(139, 92, 246, 0.12);
+
+  /* Blue — Law, Vigilance & Perseverance */
+  --blue: #3b82f6;
+  --blue-light: #60a5fa;
+  --blue-dark: #2563eb;
+
+  /* Accent gradient — purple to blue */
+  --accent-gradient: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  --accent-glow: rgba(99, 102, 241, 0.12);
+
+  /* Typography */
+  --t1: #f0f2f8;
+  --t2: #8b95b0;
+  --t3: #5a6380;
+
+  /* Borders */
+  --border: rgba(139, 148, 180, 0.08);
+  --border-accent: rgba(139, 92, 246, 0.2);
+
+  /* Semantic */
+  --green: #10b981;
+  --amber: #f59e0b;
+  --red: #ef4444;
+
+  /* Fonts */
+  --sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --serif: 'Crimson Pro', Georgia, serif;
+  --body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --t4: #3d4560;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg1);
+  color: var(--t1);
+  line-height: 1.65;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% -10%, rgba(139, 92, 246, 0.1), transparent),
+    radial-gradient(ellipse 50% 40% at 85% 50%, rgba(59, 130, 246, 0.06), transparent),
+    radial-gradient(ellipse 50% 40% at 15% 80%, rgba(139, 92, 246, 0.05), transparent);
+}
+
+a {
+  color: var(--purple-light);
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--purple-dark);
+}
