@@ -3430,3 +3430,308 @@
     height: 150px;
   }
 }
+
+/* ===== COMPREHENSIVE MOBILE RESPONSIVE ===== */
+@media (max-width: 600px) {
+
+  /* Hero */
+  .hero {
+    padding: 90px 16px 50px;
+    min-height: auto;
+  }
+
+  .heroInner {
+    max-width: 100%;
+  }
+
+  .heroInner h1 {
+    font-size: 28px !important;
+    line-height: 1.2;
+  }
+
+  .heroInner p {
+    font-size: 14px;
+    padding: 0 4px;
+  }
+
+  /* Hero buttons */
+  .heroActions {
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 8px;
+  }
+
+  .heroActions button,
+  .heroActions a {
+    width: 100%;
+    font-size: 14px;
+    padding: 12px 20px;
+  }
+
+  /* Case Type Grid */
+  .typeGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 0 4px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .card h4 {
+    font-size: 13px;
+  }
+
+  .card p {
+    font-size: 11px;
+  }
+
+  /* Trust Section */
+  .trustSection {
+    padding: 20px 12px;
+  }
+
+  .trustInner {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .trustItem {
+    font-size: 12px;
+  }
+
+  .trustDot {
+    display: none;
+  }
+
+  /* Section Dividers */
+  .sectionDivider {
+    padding: 0 16px;
+  }
+
+  /* Form Section */
+  .formSection {
+    padding: 80px 14px 40px;
+  }
+
+  .formHeader h1 {
+    font-size: 22px;
+  }
+
+  .formGroup label {
+    font-size: 13px;
+  }
+
+  .formGroup select,
+  .formGroup input,
+  .formGroup textarea {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+
+  .sampleCases {
+    flex-direction: column;
+  }
+
+  .sampleCase {
+    font-size: 12px;
+  }
+
+  /* Results Section */
+  .resultsGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .resSection {
+    padding: 20px 14px;
+  }
+
+  .resSection h2 {
+    font-size: 16px;
+  }
+
+  .statsBar {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .statCard {
+    padding: 12px;
+  }
+
+  .statCard h3 {
+    font-size: 20px;
+  }
+
+  .statCard p {
+    font-size: 11px;
+  }
+
+  .gaugeWrap {
+    transform: scale(0.85);
+  }
+
+  .resHeader {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  /* Statistics Section */
+  .statsSection {
+    padding: 80px 12px 40px;
+  }
+
+  .statsSection h1 {
+    font-size: 22px;
+  }
+
+  .tableWrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dataTable {
+    font-size: 11px;
+    min-width: 500px;
+  }
+
+  .dataTable th,
+  .dataTable td {
+    padding: 8px 6px;
+  }
+
+  /* Courts Section */
+  .courtsSection {
+    padding: 80px 12px 40px;
+  }
+
+  .courtsHeader h1 {
+    font-size: 22px;
+  }
+
+  .courtsHeader p {
+    font-size: 13px;
+  }
+
+  .courtsSearchBar {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .courtsSearchBar input {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  .courtsSearchBar button {
+    width: 100%;
+  }
+
+  .courtsMapContainer {
+    height: 250px;
+  }
+
+  .courtsGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .courtCard {
+    padding: 14px;
+  }
+
+  /* News Section */
+  .newsSection {
+    padding: 80px 12px 40px;
+  }
+
+  .newsSection h1 {
+    font-size: 22px;
+  }
+
+  .newsGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .newsCard {
+    border-radius: 12px;
+  }
+
+  .newsCardBody {
+    padding: 14px;
+  }
+
+  .newsCardBody h3 {
+    font-size: 14px;
+  }
+
+  .newsFilters {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .newsFilter {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  /* Footer */
+  .footer {
+    padding: 24px 16px;
+  }
+
+  .footer p {
+    font-size: 13px;
+  }
+
+  /* History Section */
+  .historySection {
+    padding: 0 14px;
+    margin: 10px auto 30px;
+  }
+
+  .historyGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Chatbot */
+  .chatWidget {
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .chatWindow {
+    width: calc(100vw - 24px);
+    height: 70vh;
+    right: 0;
+    bottom: 60px;
+  }
+
+  .chatMessages {
+    padding: 12px;
+  }
+
+  .chatInput input {
+    font-size: 14px;
+  }
+
+  /* General spacing */
+  .page {
+    overflow-x: hidden;
+  }
+
+  .btnPrimary,
+  .btnSecondary {
+    font-size: 13px;
+    padding: 11px 20px;
+  }
+
+  .sectionTitle {
+    font-size: 20px;
+  }
+}
