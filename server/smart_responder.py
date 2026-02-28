@@ -1,62 +1,14 @@
 """
 NyayBase — Smart Response Generator (Real-time LLM)
 Constructs structured legal analysis by combining RAG-retrieved documents 
-with real-time reasoning from a local Ollama LLM (llama3.2:1b).
+with real-time reasoning from LLM cascade (Gemini → Groq → Ollama).
 """
 
 import json
 import urllib.request
 import re
 from knowledge_base import CASE_TYPES, JURISDICTIONS
-
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL_NAME = "llama3.2:1b"
-
-def _call_ollama_json(system_prompt: str, user_prompt: str, retries: int = 2) -> dict:
-    """Call local Ollama model and force JSON output, with basic retry logic."""
-    
-    prompt = f"{system_prompt}\n\nUSER INPUT:\n====\n{user_prompt}\n====\n\nRemember: Output ONLY valid JSON."
-    
-    data = {
-        "model": MODEL_NAME,
-        "prompt": prompt,
-        "format": "json",
-        "stream": False,
-        "options": {
-            "temperature": 0.2, # Low temp for analytical consistency
-            "num_ctx": 2048,    # Reduced context to speed up CPU inference
-            "num_thread": 8     # Leverage multiple CPU cores
-        }
-    }
-    
-    req = urllib.request.Request(
-        OLLAMA_URL, 
-        data=json.dumps(data).encode('utf-8'),
-        headers={'Content-Type': 'application/json'}
-    )
-
-    for attempt in range(retries):
-        try:
-            with urllib.request.urlopen(req, timeout=120) as response:
-                result = json.loads(response.read().decode('utf-8'))
-                
-                # Ollama returns the generated text in 'response'
-                text_response = result.get('response', '')
-                
-                # Try to clean and parse the JSON
-                # Sometimes models wrap JSON in markdown blocks
-                text_response = re.sub(r'^```json\s*', '', text_response)
-                text_response = re.sub(r'^```\s*', '', text_response)
-                text_response = re.sub(r'```$', '', text_response, flags=re.MULTILINE)
-                
-                return json.loads(text_response.strip())
-                
-        except Exception as e:
-            print(f"[Ollama] Error on attempt {attempt + 1}: {e}")
-            if attempt == retries - 1:
-                raise Exception(f"Failed to generate valid JSON from Ollama: {e}")
-
-    return {}
+from llm_providers import call_llm
 
 
 def generate_analysis(case_type: str, facts: str, jurisdiction: str,
@@ -196,9 +148,9 @@ Generate exactly 4-5 key_arguments and 3-4 risk_factors.
     user_prompt = f"Case Facts provided by user:\n{facts}"
 
     # 3. Call LLM
-    print("[NyayBase] Generating dynamic analysis via Ollama (llama3.2:1b)...")
+    print("[NyayBase] Generating dynamic analysis via LLM cascade...")
     try:
-        llm_response = _call_ollama_json(system_prompt, user_prompt)
+        llm_response = call_llm(system_prompt, user_prompt)
     except Exception as e:
         print(f"[NyayBase] LLM failed: {e}. Falling back to default empty response.")
         llm_response = {}
