@@ -6,8 +6,6 @@ NyayBase predicts court case outcomes, discovers winning arguments, and provides
 
 ### 🔗 [Try NyayBase Live →](https://nyaybase.vercel.app)
 
-> **Backend API:** https://nyaybase.onrender.com/api
-
 ---
 
 ## Features
@@ -122,10 +120,8 @@ NyayBase/
 
 ## Deployment
 
-| Service | Platform | URL |
-|---------|----------|-----|
-| Frontend | Vercel | [nyaybase.vercel.app](https://nyaybase.vercel.app) |
-| Backend | Render | [nyaybase.onrender.com](https://nyaybase.onrender.com) |
+- **Live Site:** [nyaybase.vercel.app](https://nyaybase.vercel.app)
+- Frontend hosted on **Vercel**, Backend hosted on **Render**
 
 ## License
 
