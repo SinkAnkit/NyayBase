@@ -12,9 +12,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy app
 COPY . .
 
-# Expose port (Render sets PORT env var)
+# Expose port
 EXPOSE 8000
 
-# Run with gunicorn + uvicorn workers for production stability
-CMD ["gunicorn", "main:app", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--workers", "1", "--timeout", "120"]
-
+# Run with gunicorn — use $PORT from Railway/Render, default 8000
+CMD gunicorn main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:${PORT:-8000} --workers 1 --timeout 120
