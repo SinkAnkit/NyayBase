@@ -13,7 +13,32 @@ from legal_news import fetch_legal_news
 import threading
 import time
 import os
+import platform
 import requests as http_requests
+
+
+def _detect_amd_platform():
+    """Detect AMD hardware for AMD Slingshot platform awareness."""
+    info = {"amd_detected": False, "processor": platform.processor(), "machine": platform.machine()}
+    try:
+        with open("/proc/cpuinfo", "r") as f:
+            cpuinfo = f.read()
+        if "AMD" in cpuinfo or "AuthenticAMD" in cpuinfo:
+            info["amd_detected"] = True
+            # Extract model name
+            for line in cpuinfo.split("\n"):
+                if "model name" in line:
+                    info["cpu_model"] = line.split(":")[1].strip()
+                    break
+            info["rocm_available"] = os.path.exists("/opt/rocm") or bool(os.environ.get("HSA_OVERRIDE_GFX_VERSION"))
+            print(f"[NyayBase] AMD Platform detected: {info.get('cpu_model', 'Unknown AMD CPU')}")
+        else:
+            info["cpu_vendor"] = "non-AMD"
+    except FileNotFoundError:
+        info["cpu_vendor"] = platform.processor() or "unknown"
+    return info
+
+_amd_info = None
 
 
 def _build_index_background():
@@ -89,7 +114,15 @@ def root():
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "service": "NyayBase API", "version": "2.0.0"}
+    global _amd_info
+    if _amd_info is None:
+        _amd_info = _detect_amd_platform()
+    return {
+        "status": "ok",
+        "service": "NyayBase API",
+        "version": "2.0.0",
+        "platform": _amd_info,
+    }
 
 @app.get("/api/case-types")
 def get_case_types():
