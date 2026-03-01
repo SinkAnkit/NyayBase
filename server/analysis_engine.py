@@ -39,6 +39,151 @@ def is_gibberish(text):
     return False, "valid"
 
 
+# ─── Semantic Input Quality Scoring ───
+# Keywords that indicate real legal content
+_LEGAL_KEYWORDS = {
+    "dispute", "case", "complaint", "filed", "court", "judge", "lawyer", "advocate",
+    "agreement", "contract", "property", "land", "rent", "tenant", "landlord",
+    "cheque", "bounce", "loan", "debt", "payment", "money", "salary", "wages",
+    "accident", "injury", "death", "hospital", "medical", "insurance",
+    "divorce", "custody", "maintenance", "marriage", "husband", "wife", "domestic",
+    "fir", "police", "arrest", "bail", "theft", "fraud", "assault", "murder",
+    "termination", "employment", "fired", "resigned", "employer", "employee",
+    "consumer", "defective", "product", "service", "refund", "warranty",
+    "tax", "income", "gst", "assessment", "notice", "penalty",
+    "copyright", "trademark", "patent", "infringement",
+    "government", "authority", "municipal", "acquisition",
+    "evidence", "witness", "document", "receipt", "proof", "certificate",
+    "section", "act", "ipc", "crpc", "bns", "bnss", "cpc",
+    "compensation", "damages", "injunction", "relief", "petition", "appeal",
+    "violation", "rights", "fundamental", "constitutional",
+}
+
+_SPECIFICITY_KEYWORDS = {
+    "date", "january", "february", "march", "april", "may", "june", "july",
+    "august", "september", "october", "november", "december",
+    "lakh", "crore", "rupee", "rs", "₹", "inr",
+    "registered", "notarized", "stamped", "signed", "certified",
+    "years", "months", "days", "since", "ago", "when",
+}
+
+_EVIDENCE_KEYWORDS = {
+    "agreement", "contract", "receipt", "invoice", "fir", "witness", "cctv",
+    "video", "recording", "notarized", "stamp paper", "affidavit",
+    "bank statement", "photograph", "medical report", "forensic",
+    "email", "whatsapp", "screenshot", "digital evidence", "certified copy",
+    "sale deed", "title deed", "registration", "survey", "tax receipt",
+    "appointment letter", "salary slip", "termination letter", "offer letter",
+    "charge sheet", "postmortem", "disability certificate",
+}
+
+
+def compute_input_quality(text: str) -> dict:
+    """
+    Score input quality from 0-100 based on legal relevance and specificity.
+    Returns: {"score": int, "label": str, "max_probability": int, "issues": list}
+    """
+    if not text or len(text.strip()) < 20:
+        return {"score": 0, "label": "Insufficient", "max_probability": 10, "issues": ["Input too short"]}
+
+    lower = text.lower()
+    words = lower.split()
+    word_count = len(words)
+    score = 0
+    issues = []
+
+    # 1. Length score (max 20 pts) — more detail = better
+    if word_count >= 80:
+        score += 20
+    elif word_count >= 50:
+        score += 16
+    elif word_count >= 30:
+        score += 12
+    elif word_count >= 15:
+        score += 8
+    else:
+        score += 3
+        issues.append("Very brief description — add more detail about what happened")
+
+    # 2. Legal keyword hits (max 25 pts)
+    legal_hits = sum(1 for kw in _LEGAL_KEYWORDS if kw in lower)
+    if legal_hits >= 8:
+        score += 25
+    elif legal_hits >= 5:
+        score += 20
+    elif legal_hits >= 3:
+        score += 14
+    elif legal_hits >= 1:
+        score += 7
+    else:
+        score += 0
+        issues.append("No recognizable legal terms — describe your legal dispute clearly")
+
+    # 3. Specificity — dates, amounts, names (max 20 pts)
+    specificity_hits = sum(1 for kw in _SPECIFICITY_KEYWORDS if kw in lower)
+    date_matches = len(re.findall(r'\b\d{1,2}[/\-]\d{1,2}[/\-]\d{2,4}\b', text))
+    money_matches = len(re.findall(r'₹\s*[\d,]+|rs\.?\s*[\d,]+|lakh|crore|rupee', lower))
+    specificity_score = min(20, specificity_hits * 3 + date_matches * 4 + money_matches * 4)
+    score += specificity_score
+    if specificity_score < 5:
+        issues.append("Add specific dates, amounts, and names for better analysis")
+
+    # 4. Evidence mentions (max 20 pts)
+    evidence_hits = sum(1 for kw in _EVIDENCE_KEYWORDS if kw in lower)
+    evidence_score = min(20, evidence_hits * 5)
+    score += evidence_score
+    if evidence_hits == 0:
+        issues.append("Mention what evidence you have (documents, witnesses, receipts)")
+
+    # 5. Coherence — has parties, dispute, outcome (max 15 pts)
+    has_parties = any(w in lower for w in ["my", "i ", "me ", "we ", "our", "plaintiff", "defendant",
+                                            "accused", "complainant", "petitioner", "respondent",
+                                            "husband", "wife", "landlord", "tenant", "employer", "employee",
+                                            "company", "neighbour", "neighbor", "bank", "police"])
+    has_dispute = any(w in lower for w in ["dispute", "problem", "issue", "case", "complaint",
+                                           "happened", "incident", "violated", "refused", "denied",
+                                           "cheated", "fraud", "assault", "stolen", "damaged",
+                                           "terminated", "evicted", "encroached", "harassed", "threatened"])
+    has_relief = any(w in lower for w in ["want", "seek", "claim", "recover", "compensation",
+                                          "damages", "refund", "injunction", "arrest", "bail",
+                                          "custody", "maintenance", "divorce", "acquittal", "relief"])
+
+    coherence = 0
+    if has_parties:
+        coherence += 5
+    else:
+        issues.append("Mention the parties involved (who is the dispute with)")
+    if has_dispute:
+        coherence += 5
+    else:
+        issues.append("Describe what happened or what the dispute is about")
+    if has_relief:
+        coherence += 5
+    score += coherence
+
+    # Final score capped at 100
+    score = min(100, max(0, score))
+
+    # Determine label and max probability cap
+    if score >= 65:
+        label = "Strong"
+        max_prob = 95
+    elif score >= 45:
+        label = "Fair"
+        max_prob = 70
+    elif score >= 25:
+        label = "Weak"
+        max_prob = 40
+    else:
+        label = "Very Weak"
+        max_prob = 20
+
+    print(f"[NyayBase] Input quality: score={score}, label={label}, max_prob={max_prob}, "
+          f"legal_hits={legal_hits}, evidence={evidence_hits}, words={word_count}")
+
+    return {"score": score, "label": label, "max_probability": max_prob, "issues": issues}
+
+
 def gibberish_response(reason, facts, case_type_name, jurisdiction_name):
     """Return a friendly, chatbot-like response for invalid inputs."""
     messages = {
@@ -79,6 +224,52 @@ def gibberish_response(reason, facts, case_type_name, jurisdiction_name):
     }
 
 
+def weak_input_response(input_quality, case_type_name, jurisdiction_name, case_data):
+    """Return a response for input that passes gibberish check but is too weak for real analysis."""
+    issues = input_quality.get("issues", [])
+    quality_label = input_quality.get("label", "Very Weak")
+    score = input_quality.get("score", 0)
+
+    return {
+        "case_type": case_type_name,
+        "jurisdiction": jurisdiction_name,
+        "relevant_acts": case_data.get("relevant_acts", []),
+        "is_weak_input": True,
+        "input_quality": quality_label,
+        "input_score": score,
+        "win_probability": {
+            "probability": 0,
+            "lower_bound": 0,
+            "upper_bound": 0,
+            "confidence_margin": 0,
+            "strength": "Insufficient Information",
+            "strength_color": "#6b7280",
+            "base_rate": 0,
+            "adjustment": 0,
+            "factors_detected": 0,
+            "reasoning": "Your case description does not contain enough specific information for a meaningful analysis. Please provide detailed facts including what happened, who is involved, dates, evidence you have, and what outcome you seek."
+        },
+        "key_arguments": [],
+        "similar_cases": [],
+        "timeline": {
+            "estimated_months": 0, "min_months": 0, "max_months": 0, "stages": [],
+            "recommendation": "Please provide detailed case facts to get timeline estimates."
+        },
+        "mediation": {
+            "recommendation": "N/A", "color": "#6b7280", "success_rate": 0,
+            "avg_settlement_months": 0,
+            "reasoning": "Cannot assess mediation suitability without understanding the dispute."
+        },
+        "risk_factors": [{
+            "risk": "Insufficient Case Details",
+            "severity": "High",
+            "description": "No meaningful legal facts were provided. The analysis cannot proceed without specific details about the dispute.",
+            "mitigation": "Please re-enter your case with: (1) What happened, (2) Who is involved, (3) Dates and timeline, (4) Evidence you have, (5) What relief you seek."
+        }],
+        "improvement_tips": issues,
+    }
+
+
 def analyze_case(case_type, facts, jurisdiction, sections, custom_case_type="", adverse_party="", legal_representation=""):
     """Main analysis function — uses local RAG + smart response generation."""
     ct = case_type if case_type in CASE_TYPES else "custom"
@@ -91,6 +282,14 @@ def analyze_case(case_type, facts, jurisdiction, sections, custom_case_type="", 
     if is_bad:
         print(f"[NyayBase] Input rejected (regex): reason={reason}, input='{facts[:50]}'")
         return gibberish_response(reason, facts, display_name, jur_data["name"])
+
+    # ── Semantic input quality check ──
+    input_quality = compute_input_quality(facts)
+
+    # ── Short-circuit: Very weak input → don't waste LLM call ──
+    if input_quality["score"] < 25:
+        print(f"[NyayBase] Input too weak for LLM (score={input_quality['score']}), returning weak_input_response")
+        return weak_input_response(input_quality, display_name, jur_data["name"], case_data)
 
     # ── RAG search for relevant legal context ──
     try:
@@ -116,6 +315,7 @@ def analyze_case(case_type, facts, jurisdiction, sections, custom_case_type="", 
             rag_results=rag_results,
             adverse_party=adverse_party,
             legal_representation=legal_representation,
+            input_quality=input_quality,
         )
         print(f"[NyayBase] Analysis complete — win prob: {result['win_probability']['probability']}%, "
               f"args: {len(result['key_arguments'])}, cases: {len(result['similar_cases'])}")

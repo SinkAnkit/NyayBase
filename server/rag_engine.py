@@ -187,19 +187,13 @@ def search_statutes(query: str, top_k: int = 8) -> list:
 def search_all(query: str, top_k: int = 20) -> dict:
     """
     Search across all document types and return categorized results.
+    Each type gets its own dedicated search to ensure cases are never
+    crowded out by the much larger statute pool.
     Returns {"statutes": [...], "cases": [...], "procedures": [...], "maxims": [...]}.
     """
-    results = search(query, top_k=top_k)
-
-    categorized = {"statutes": [], "cases": [], "procedures": [], "maxims": []}
-    for r in results:
-        if r["type"] in ("constitution", "bns", "civil"):
-            categorized["statutes"].append(r)
-        elif r["type"] == "case":
-            categorized["cases"].append(r)
-        elif r["type"] == "procedure":
-            categorized["procedures"].append(r)
-        elif r["type"] == "maxim":
-            categorized["maxims"].append(r)
-
-    return categorized
+    return {
+        "statutes": search(query, top_k=8, doc_types=["constitution", "bns", "civil"]),
+        "cases": search(query, top_k=8, doc_types=["case"]),
+        "procedures": search(query, top_k=4, doc_types=["procedure"]),
+        "maxims": search(query, top_k=4, doc_types=["maxim"]),
+    }

@@ -1,15 +1,11 @@
 """
 NyayBase — Legal Chatbot Module
-Handles general legal queries using RAG + Ollama LLM.
+Handles general legal queries using RAG + LLM cascade (Gemini → Groq → Ollama).
 """
 
-import json
-import urllib.request
 import re
 import random
-
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL_NAME = "llama3.2:1b"
+from llm_providers import call_llm_text
 
 # ── Greeting Detection (instant response, no LLM call) ──
 GREETING_PATTERNS = {
@@ -131,42 +127,10 @@ RULES:
 """
 
 
-def _call_ollama_text(system_prompt: str, user_prompt: str, timeout: int = 60, max_tokens: int = 400) -> str:
-    """Call local Ollama model and return plain text response."""
-    prompt = f"{system_prompt}\n\nUser: {user_prompt}\n\nAssistant:"
-
-    data = {
-        "model": MODEL_NAME,
-        "prompt": prompt,
-        "stream": False,
-        "options": {
-            "temperature": 0.5,
-            "num_ctx": 2048,
-            "num_predict": max_tokens,
-            "num_thread": 8,
-            "top_p": 0.9,
-        }
-    }
-
-    req = urllib.request.Request(
-        OLLAMA_URL,
-        data=json.dumps(data).encode('utf-8'),
-        headers={'Content-Type': 'application/json'}
-    )
-
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as response:
-            result = json.loads(response.read().decode('utf-8'))
-            return result.get('response', '').strip()
-    except Exception as e:
-        print(f"[Chatbot] Ollama error: {e}")
-        raise Exception(f"Failed to generate response: {e}")
-
-
 def chat(message: str, history: list = None) -> str:
     """
     Process a chat message and return a response.
-    Smart greeting detection + RAG + Ollama LLM.
+    Smart greeting detection + RAG + LLM cascade (Gemini → Groq → Ollama).
     """
     if not message or not message.strip():
         return "Please ask me a legal question and I'll do my best to help you."
@@ -219,18 +183,15 @@ def chat(message: str, history: list = None) -> str:
             content = h.get("content", "")[:200]
             history_str += f"\n{'User' if role == 'user' else 'Assistant'}: {content}"
 
-    # ── 4. Compose and send to LLM ──
+    # ── 4. Compose and send to LLM cascade ──
     full_system = SYSTEM_PROMPT + rag_context
     full_user = ""
     if history_str:
         full_user += f"Previous conversation:{history_str}\n\n"
     full_user += f"Current question: {message}"
 
-    # Use fewer tokens for shorter queries
-    max_tokens = 300 if len(message.strip()) < 30 else 500
-
     try:
-        response = _call_ollama_text(full_system, full_user, max_tokens=max_tokens)
+        response = call_llm_text(full_system, full_user)
         if not response:
             return "I apologize, but I'm having trouble generating a response right now. Please try again in a moment."
         return response

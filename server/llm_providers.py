@@ -132,13 +132,98 @@ def _call_ollama(system_prompt: str, user_msg: str) -> dict:
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Main cascade function
+# Text-mode providers (for chatbot — returns plain text, not JSON)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+def _call_gemini_text(system_prompt: str, user_msg: str) -> str:
+    """Call Google Gemini 2.0 Flash and return plain text."""
+    if not GEMINI_API_KEY:
+        raise ValueError("GEMINI_API_KEY not set")
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
+    payload = {
+        "contents": [{"parts": [{"text": user_msg}]}],
+        "systemInstruction": {"parts": [{"text": system_prompt}]},
+        "generationConfig": {
+            "temperature": 0.5,
+            "maxOutputTokens": 1024,
+        },
+    }
+    resp = requests.post(url, json=payload, timeout=60)
+    resp.raise_for_status()
+    data = resp.json()
+    return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+
+
+def _call_groq_text(system_prompt: str, user_msg: str) -> str:
+    """Call Groq API and return plain text."""
+    if not GROQ_API_KEY:
+        raise ValueError("GROQ_API_KEY not set")
+
+    from groq import Groq
+    client = Groq(api_key=GROQ_API_KEY)
+
+    for i, model in enumerate(GROQ_MODELS):
+        retries = 2 if i == 0 else 1
+        for attempt in range(retries):
+            try:
+                if attempt > 0:
+                    wait = 3 * (2 ** (attempt - 1))
+                    print(f"[LLM] Groq text retry {attempt} on {model}, waiting {wait}s...")
+                    time.sleep(wait)
+
+                print(f"[LLM] Calling Groq {model} text mode (attempt {attempt+1}/{retries})")
+                response = client.chat.completions.create(
+                    model=model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_msg},
+                    ],
+                    temperature=0.5,
+                    max_tokens=1024,
+                )
+                return response.choices[0].message.content.strip()
+
+            except Exception as e:
+                print(f"[LLM] Groq {model} text failed (attempt {attempt+1}): {e}")
+                err_str = str(e).lower()
+                if "rate_limit" not in err_str and "429" not in err_str:
+                    break
+
+    raise RuntimeError("All Groq models exhausted (text mode)")
+
+
+def _call_ollama_text(system_prompt: str, user_msg: str) -> str:
+    """Call local Ollama server and return plain text."""
+    url = f"{OLLAMA_BASE_URL}/api/chat"
+    payload = {
+        "model": OLLAMA_MODEL,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_msg},
+        ],
+        "stream": False,
+        "options": {"temperature": 0.5, "num_predict": 1024},
+    }
+    resp = requests.post(url, json=payload, timeout=120)
+    resp.raise_for_status()
+    return resp.json()["message"]["content"].strip()
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Main cascade functions
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 PROVIDERS = [
     ("Gemini", _call_gemini),
     ("Groq", _call_groq),
     ("Ollama", _call_ollama),
+]
+
+TEXT_PROVIDERS = [
+    ("Gemini", _call_gemini_text),
+    ("Groq", _call_groq_text),
+    ("Ollama", _call_ollama_text),
 ]
 
 
@@ -162,3 +247,26 @@ def call_llm(system_prompt: str, user_msg: str) -> dict:
             errors.append(err_msg)
 
     raise RuntimeError(f"All LLM providers failed: {'; '.join(errors)}")
+
+
+def call_llm_text(system_prompt: str, user_msg: str) -> str:
+    """
+    Call LLM with automatic cascade: Gemini → Groq → Ollama.
+    Returns plain text string from whichever provider succeeds first.
+    Used by chatbot for conversational responses.
+    Raises RuntimeError only if ALL providers fail.
+    """
+    errors = []
+
+    for name, fn in TEXT_PROVIDERS:
+        try:
+            print(f"[LLM-Text] Trying {name}...")
+            result = fn(system_prompt, user_msg)
+            print(f"[LLM-Text] ✓ Success via {name}")
+            return result
+        except Exception as e:
+            err_msg = f"{name}: {e}"
+            print(f"[LLM-Text] ✗ {err_msg}")
+            errors.append(err_msg)
+
+    raise RuntimeError(f"All LLM providers failed (text mode): {'; '.join(errors)}")

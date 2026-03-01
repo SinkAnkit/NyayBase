@@ -11,6 +11,9 @@ from knowledge_base import CASE_TYPES, JURISDICTIONS
 from courts_data import search_courts
 from legal_news import fetch_legal_news
 import threading
+import time
+import os
+import requests as http_requests
 
 
 def _build_index_background():
@@ -22,12 +25,34 @@ def _build_index_background():
         print(f"[NyayBase] RAG index build error: {e}")
 
 
+def _keep_alive():
+    """Self-ping to prevent Render free tier from sleeping (every 13 min)."""
+    # Wait 60s for server to start up fully
+    time.sleep(60)
+    render_url = os.environ.get("RENDER_EXTERNAL_URL", "")
+    if not render_url:
+        print("[NyayBase] No RENDER_EXTERNAL_URL set, skip keep-alive self-ping")
+        return
+    health_url = f"{render_url}/api/health"
+    print(f"[NyayBase] Keep-alive started, pinging {health_url} every 13 min")
+    while True:
+        try:
+            resp = http_requests.get(health_url, timeout=10)
+            print(f"[NyayBase] Keep-alive ping: {resp.status_code}")
+        except Exception as e:
+            print(f"[NyayBase] Keep-alive ping failed: {e}")
+        time.sleep(13 * 60)  # 13 minutes
+
+
 @asynccontextmanager
 async def lifespan(app):
     # Startup: build RAG index in background thread
     print("[NyayBase] Starting RAG index build in background...")
     t = threading.Thread(target=_build_index_background, daemon=True)
     t.start()
+    # Start keep-alive self-ping for Render
+    ka = threading.Thread(target=_keep_alive, daemon=True)
+    ka.start()
     yield
     # Shutdown: nothing to clean up
 

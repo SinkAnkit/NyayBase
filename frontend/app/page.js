@@ -1191,21 +1191,21 @@ export default function Home() {
   /* ------ RESULTS ------ */
   if (view === "results" && results) {
     /* Invalid Input Screen */
-    if (results.is_invalid_input) renderView = (
+    if (results.is_invalid_input || results.is_weak_input) renderView = (
       <main className={styles.page}>
         <NavBar active="analyze" />
         <section className={styles.formSection}>
           <div className={styles.invalidBox}>
             <div className={styles.invalidIcon}>{I("Alert")}</div>
-            <h2>Invalid Input Detected</h2>
-            <p className={styles.invalidMsg}>{results.error_message}</p>
-            {results.suggestions && results.suggestions.length > 0 && (
+            <h2>{results.is_invalid_input ? "Invalid Input Detected" : "Insufficient Case Details"}</h2>
+            <p className={styles.invalidMsg}>{results.error_message || results.win_probability?.reasoning || "Your case description does not contain enough specific information for a meaningful analysis."}</p>
+            {(results.suggestions || results.improvement_tips) && (results.suggestions || results.improvement_tips).length > 0 && (
               <ul className={styles.invalidList}>
-                {results.suggestions.map((s, i) => <li key={i}>{I("Check")} {s}</li>)}
+                {(results.suggestions || results.improvement_tips).map((s, i) => <li key={i}>{I("Check")} {s}</li>)}
               </ul>
             )}
             {results.example_input && <div className={styles.invalidExample}><strong>Example:</strong> {results.example_input}</div>}
-            <button className={styles.btnPrimary} onClick={goToForm}>{I("ArrowLeft")} Go Back & Enter Valid Case Details</button>
+            <button className={styles.btnPrimary} onClick={goToForm}>{I("ArrowLeft")} Go Back & Enter Detailed Case Facts</button>
           </div>
         </section>
       </main>

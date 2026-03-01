@@ -14,7 +14,8 @@ from llm_providers import call_llm
 def generate_analysis(case_type: str, facts: str, jurisdiction: str,
                       sections: str = "", custom_case_type: str = "",
                       rag_results: dict = None, adverse_party: str = "",
-                      legal_representation: str = "") -> dict:
+                      legal_representation: str = "",
+                      input_quality: dict = None) -> dict:
     """
     Generate a complete legal analysis using RAG + Local Ollama LLM.
     """
@@ -121,19 +122,45 @@ def generate_analysis(case_type: str, facts: str, jurisdiction: str,
             rep_context = f"\nYOUR REPRESENTATION: {rep_label}."
             print(f"[NyayBase] Legal representation: {legal_representation}, adjustment={rep_adjustment}")
 
+    # Build input quality context for the LLM
+    iq = input_quality or {"score": 50, "label": "Fair", "max_probability": 70, "issues": []}
+    quality_instruction = ""
+    if iq["score"] < 25:
+        quality_instruction = f"""\n\nCRITICAL — INPUT QUALITY: VERY WEAK (score {iq['score']}/100)
+The user's input is extremely vague, lacks specific facts, evidence, or legal substance.
+You MUST assign win_probability between 5-15%. Do NOT be generous.
+List the arguments that COULD help IF the user provided proper facts, but mark their strength as 10-30%.
+Explain in reasoning that the input lacks sufficient detail for meaningful analysis."""
+    elif iq["score"] < 45:
+        quality_instruction = f"""\n\nWARNING — INPUT QUALITY: WEAK (score {iq['score']}/100)
+The user's input has some legal relevance but lacks specific details, evidence, or key facts.
+You MUST assign win_probability between 15-30%. Do NOT give moderate or high probability.
+Be honest about the weaknesses in reasoning."""
+    elif iq["score"] < 65:
+        quality_instruction = f"""\n\nNOTE — INPUT QUALITY: FAIR (score {iq['score']}/100)
+The input has some useful facts but could be more detailed. Assess realistically.
+Assign probability based on the actual strength of provided facts."""
+
     system_prompt = f"""You are NyayBase, an Indian legal advisor. Address the client directly as "you"/"your". Be professional.
 
-Case: {display_name} | {jur_data['name']} | Base win rate: {baseline_win_rate}%
-{context_str}{adverse_context}{rep_context}
+Case: {display_name} | {jur_data['name']} | Base win rate for this case type: {baseline_win_rate}%
+{context_str}{adverse_context}{rep_context}{quality_instruction}
 
-Adjust win rate based on facts. Strong evidence=higher, weak evidence/admitted fault=lower.
+IMPORTANT RULES FOR WIN PROBABILITY:
+- The base rate is just a REFERENCE for well-documented cases. Do NOT default to it.
+- Critically evaluate the user's facts: Are they specific? Is there evidence? Are parties identified?
+- If facts are VAGUE, GENERIC, or lack specifics → assign 10-25% (Difficult)
+- If facts are MODERATELY detailed with some evidence → assign 30-55% (Challenging to Moderate)
+- If facts are WELL-DOCUMENTED with strong evidence → assign 55-85% (Moderate to Strong)
+- If facts are EXCEPTIONAL with overwhelming evidence → assign 85-95% (Strong)
+- NEVER give >50% probability for vague or poorly described cases
 
 Respond with ONLY valid JSON:
 {{
     "win_probability": {{
         "probability": <int 0-100>,
         "strength": "<Strong|Moderate|Challenging|Difficult>",
-        "reasoning": "<2-3 sentences to 'you' about why this probability, referencing case strengths/weaknesses>"
+        "reasoning": "<2-3 sentences to 'you' about why this probability, referencing specific case strengths/weaknesses>"
     }},
     "key_arguments": [
         {{"argument": "<legal argument>", "section": "<Act, Section>", "description": "<how it helps you>", "strength": <int 0-100>}}
@@ -208,6 +235,28 @@ Generate exactly 4-5 key_arguments and 3-4 risk_factors.
     if rag_similar_cases:
         llm_response["similar_cases"] = rag_similar_cases
 
+    # ── Fallback: Use knowledge_base landmark cases if RAG returned none ──
+    if not llm_response.get("similar_cases"):
+        kb_cases = case_data.get("landmark_cases", [])
+        fallback_cases = []
+        for kc in kb_cases[:5]:
+            case_name = kc.get("case_name", "Landmark Case")
+            search_query = urllib.parse.quote_plus(case_name)
+            source_url = f"https://indiankanoon.org/search/?formInput={search_query}"
+            fallback_cases.append({
+                "case_name": case_name,
+                "citation": kc.get("citation", ""),
+                "year": kc.get("year", ""),
+                "court": kc.get("court", "Supreme Court of India"),
+                "outcome": kc.get("outcome", ""),
+                "relevance_score": 75,
+                "summary": kc.get("summary", kc.get("key_principle", f"Landmark case relevant to {display_name}.")),
+                "source_url": source_url
+            })
+        if fallback_cases:
+            llm_response["similar_cases"] = fallback_cases
+            print(f"[NyayBase] Using {len(fallback_cases)} fallback landmark cases from knowledge base")
+
     # ── Fallback: Build risk_factors if LLM returned none ──
     if not llm_response.get("risk_factors"):
         llm_response["risk_factors"] = [
@@ -240,6 +289,13 @@ Generate exactly 4-5 key_arguments and 3-4 risk_factors.
     total_adjustment = adverse_adjustment + rep_adjustment
     if total_adjustment != 0:
         prob_val = max(5, min(95, prob_val + total_adjustment))
+
+    # ── Clamp probability based on input quality ──
+    iq = input_quality or {"score": 50, "label": "Fair", "max_probability": 70, "issues": []}
+    max_prob = iq["max_probability"]
+    if prob_val > max_prob:
+        print(f"[NyayBase] Clamping probability {prob_val}% → {max_prob}% (input quality: {iq['label']})")
+        prob_val = max_prob
     
     # Add adverse party risk factor if applicable
     risk_factors = llm_response.get("risk_factors", [])
@@ -251,7 +307,12 @@ Generate exactly 4-5 key_arguments and 3-4 risk_factors.
     elif prob_val < 60: color = "#f97316"
     elif prob_val < 75: color = "#f59e0b"
 
-    fallback_reasoning = f"Based on the provided facts, the baseline chance is {int(baseline_win_rate)}%."
+    # Build fallback reasoning based on input quality (never mention raw baseline for weak input)
+    iq = input_quality or {"score": 50, "label": "Fair", "max_probability": 70, "issues": []}
+    if iq["score"] < 45:
+        fallback_reasoning = "Your case description lacks sufficient detail for a confident assessment. The probability shown reflects the limited information provided. Please add specific facts, evidence, and dates for a more accurate analysis."
+    else:
+        fallback_reasoning = f"Based on the provided facts and relevant legal precedents, your case has been assessed considering the typical outcomes for {display_name} cases in {jur_data['name']}."
     
     timeline = {
         "estimated_months": est_months,
