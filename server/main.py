@@ -26,14 +26,18 @@ def _build_index_background():
 
 
 def _keep_alive():
-    """Self-ping to prevent Render free tier from sleeping (every 13 min)."""
-    # Wait 60s for server to start up fully
+    """Self-ping to keep the service alive (safety net)."""
     time.sleep(60)
+    # Check for Railway or Render URL
+    railway_domain = os.environ.get("RAILWAY_PUBLIC_DOMAIN", "")
     render_url = os.environ.get("RENDER_EXTERNAL_URL", "")
-    if not render_url:
-        print("[NyayBase] No RENDER_EXTERNAL_URL set, skip keep-alive self-ping")
+    if railway_domain:
+        health_url = f"https://{railway_domain}/api/health"
+    elif render_url:
+        health_url = f"{render_url}/api/health"
+    else:
+        print("[NyayBase] No public URL detected, skipping keep-alive self-ping")
         return
-    health_url = f"{render_url}/api/health"
     print(f"[NyayBase] Keep-alive started, pinging {health_url} every 13 min")
     while True:
         try:
@@ -41,7 +45,7 @@ def _keep_alive():
             print(f"[NyayBase] Keep-alive ping: {resp.status_code}")
         except Exception as e:
             print(f"[NyayBase] Keep-alive ping failed: {e}")
-        time.sleep(13 * 60)  # 13 minutes
+        time.sleep(13 * 60)
 
 
 @asynccontextmanager
