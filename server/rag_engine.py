@@ -1,7 +1,7 @@
 """
 NyayBase — RAG Engine
-Hybrid semantic search (sentence-transformers) + TF-IDF over the legal dataset.
-Lightweight: ~80MB embedding model on CPU, <100ms per query after warm-up.
+TF-IDF based search over the legal dataset.
+Lightweight: <10MB memory, <50ms per query.
 """
 
 import json, os, re, time, threading
@@ -10,34 +10,14 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity as sklearn_cosine
 
 # ─── Global state ───
-_model = None
-_model_lock = threading.Lock()
 _index_ready = False
 
 # Document stores (populated by build_index)
 _docs = []           # list of {"text": str, "type": str, "data": dict}
-_embeddings = None   # np.ndarray (N, dim)
 _tfidf_matrix = None
 _tfidf_vectorizer = None
 
 DATASET_PATH = os.path.join(os.path.dirname(__file__), "legal_dataset.json")
-MODEL_NAME = "all-MiniLM-L6-v2"  # 80MB, fast on CPU
-
-
-def _get_model():
-    """Lazy-load the sentence-transformers model (thread-safe)."""
-    global _model
-    if _model is not None:
-        return _model
-    with _model_lock:
-        if _model is not None:
-            return _model
-        print(f"[RAG] Loading embedding model '{MODEL_NAME}'...")
-        t0 = time.time()
-        from sentence_transformers import SentenceTransformer
-        _model = SentenceTransformer(MODEL_NAME)
-        print(f"[RAG] Model loaded in {time.time()-t0:.1f}s")
-        return _model
 
 
 def _flatten_dataset(db: dict) -> list:
@@ -89,8 +69,8 @@ def _flatten_dataset(db: dict) -> list:
 
 
 def build_index():
-    """Pre-compute embeddings + TF-IDF matrix for the full dataset. Call once at startup."""
-    global _docs, _embeddings, _tfidf_matrix, _tfidf_vectorizer, _index_ready
+    """Pre-compute TF-IDF matrix for the full dataset. Call once at startup."""
+    global _docs, _tfidf_matrix, _tfidf_vectorizer, _index_ready
 
     if _index_ready:
         return
@@ -111,9 +91,9 @@ def build_index():
     texts = [d["text"] for d in _docs]
     print(f"[RAG] Flattened {len(_docs)} documents from dataset")
 
-    # TF-IDF index (fast, lightweight)
+    # TF-IDF index (fast, lightweight, <10MB memory)
     _tfidf_vectorizer = TfidfVectorizer(
-        max_features=8000,
+        max_features=10000,
         stop_words="english",
         ngram_range=(1, 2),
         sublinear_tf=True,
@@ -121,52 +101,36 @@ def build_index():
     _tfidf_matrix = _tfidf_vectorizer.fit_transform(texts)
     print(f"[RAG] TF-IDF index built ({_tfidf_matrix.shape})")
 
-    # Semantic embeddings (heavier but more accurate)
-    model = _get_model()
-    _embeddings = model.encode(texts, batch_size=128, show_progress_bar=True, normalize_embeddings=True)
-    _embeddings = np.array(_embeddings, dtype=np.float32)
-    print(f"[RAG] Embeddings computed ({_embeddings.shape})")
-
     _index_ready = True
     print(f"[RAG] Index ready in {time.time()-t0:.1f}s")
 
 
 def search(query: str, top_k: int = 15, doc_types: list = None) -> list:
     """
-    Hybrid search: 70% semantic + 30% TF-IDF.
+    TF-IDF based search.
     Returns list of {"score": float, "type": str, "data": dict}.
     """
     if not _index_ready or not _docs:
         return []
 
-    model = _get_model()
-
-    # Semantic similarity
-    q_emb = model.encode([query], normalize_embeddings=True)
-    q_emb = np.array(q_emb, dtype=np.float32)
-    sem_scores = np.dot(_embeddings, q_emb.T).flatten()
-
     # TF-IDF similarity
     q_tfidf = _tfidf_vectorizer.transform([query])
-    tfidf_scores = sklearn_cosine(q_tfidf, _tfidf_matrix).flatten()
-
-    # Hybrid score
-    combined = 0.7 * sem_scores + 0.3 * tfidf_scores
+    scores = sklearn_cosine(q_tfidf, _tfidf_matrix).flatten()
 
     # Filter by doc type if requested
     if doc_types:
         mask = np.array([d["type"] in doc_types for d in _docs], dtype=bool)
-        combined = combined * mask
+        scores = scores * mask
 
     # Top-K
-    top_indices = np.argsort(combined)[::-1][:top_k]
+    top_indices = np.argsort(scores)[::-1][:top_k]
 
     results = []
     for idx in top_indices:
-        if combined[idx] < 0.05:
+        if scores[idx] < 0.05:
             continue
         results.append({
-            "score": float(combined[idx]),
+            "score": float(scores[idx]),
             "type": _docs[idx]["type"],
             "data": _docs[idx]["data"],
         })
@@ -197,3 +161,4 @@ def search_all(query: str, top_k: int = 20) -> dict:
         "procedures": search(query, top_k=4, doc_types=["procedure"]),
         "maxims": search(query, top_k=4, doc_types=["maxim"]),
     }
+
