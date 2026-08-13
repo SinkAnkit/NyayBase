@@ -1,46 +1,70 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Crimson+Pro:wght@400;500;600;700;800&display=swap');
+/* ==========================================================================
+   NyayBase — Enterprise Editorial Design Tokens
+   White base · indigo-600 accent · Inter · dense editorial layout
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 :root {
-  /* Deep navy/charcoal base */
-  --bg1: #080b16;
-  --bg2: #0e1525;
-  --bg-card: rgba(14, 21, 42, 0.65);
-  --bg-glass: rgba(12, 18, 36, 0.6);
+  /* ---- Backgrounds ---- */
+  --bg1: #ffffff;               /* page base (light)          */
+  --bg2: #f9fafb;               /* gray-50 subtle band        */
+  --bg-card: #f9fafb;           /* editorial cards on light   */
+  --bg-glass: rgba(255, 255, 255, 0.9);
 
-  /* Purple — Justice & Dignity */
-  --purple: #8b5cf6;
-  --purple-light: #a78bfa;
-  --purple-dark: #7c3aed;
-  --purple-glow: rgba(139, 92, 246, 0.12);
+  /* Dark section backgrounds (alternating bands) */
+  --bg-dark: #111827;           /* gray-900                   */
+  --bg-darker: #030712;         /* gray-950                   */
+  --bg-dark-card: #1f2937;      /* gray-800 (mockup frame)    */
+  --bg-dark-screen: #030712;    /* gray-950 (mockup screen)   */
 
-  /* Blue — Law, Vigilance & Perseverance */
-  --blue: #3b82f6;
-  --blue-light: #60a5fa;
-  --blue-dark: #2563eb;
+  /* ---- Brand — Indigo ---- */
+  --purple: #4f46e5;            /* indigo-600 (primary brand) */
+  --purple-light: #6366f1;      /* indigo-500                 */
+  --purple-dark: #4338ca;       /* indigo-700 (hover)         */
+  --purple-glow: rgba(79, 70, 229, 0.08);
+  --brand-100: #e0e7ff;         /* indigo-100                 */
+  --brand-50: #eef2ff;          /* indigo-50                  */
 
-  /* Accent gradient — purple to blue */
-  --accent-gradient: linear-gradient(135deg, #8b5cf6, #3b82f6);
-  --accent-glow: rgba(99, 102, 241, 0.12);
+  /* Accent kept in the indigo family (monochrome editorial) */
+  --accent: #4f46e5;
+  --accent-light: #6366f1;
+  --accent-glow: rgba(79, 70, 229, 0.10);
 
-  /* Typography */
-  --t1: #f0f2f8;
-  --t2: #8b95b0;
-  --t3: #5a6380;
+  /* Blue — mapped to indigo for cohesion */
+  --blue: #4f46e5;
+  --blue-light: #6366f1;
+  --blue-dark: #4338ca;
 
-  /* Borders */
-  --border: rgba(139, 148, 180, 0.08);
-  --border-accent: rgba(139, 92, 246, 0.2);
+  --accent-gradient: linear-gradient(135deg, #4f46e5, #6366f1);
 
-  /* Semantic */
-  --green: #10b981;
-  --amber: #f59e0b;
-  --red: #ef4444;
+  /* ---- Typography colors (dark on light) ---- */
+  --t1: #111827;                /* gray-900 headings          */
+  --t2: #4b5563;                /* gray-600 body              */
+  --t3: #6b7280;                /* gray-500 muted             */
+  --t4: #9ca3af;                /* gray-400 faint             */
 
-  /* Fonts */
-  --sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --serif: 'Crimson Pro', Georgia, serif;
-  --body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --t4: #3d4560;
+  /* ---- Borders ---- */
+  --border: #f3f4f6;            /* gray-100                   */
+  --border-accent: rgba(79, 70, 229, 0.25);
+
+  /* ---- Semantic ---- */
+  --green: #16a34a;
+  --amber: #d97706;
+  --red: #dc2626;
+
+  /* ---- Fonts (Inter everywhere; headlines use black weight) ---- */
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --body: var(--sans);
+
+  /* ---- Editorial shadows (colored on light) ---- */
+  --shadow-card: 0 1px 2px rgba(17, 24, 39, 0.04);
+  --shadow-hover: 0 30px 60px -15px rgba(79, 70, 229, 0.18);
+  --shadow-cta: 0 20px 40px -12px rgba(17, 24, 39, 0.35);
+  --shadow-indigo: 0 12px 30px -8px rgba(79, 70, 229, 0.35);
+
+  /* ---- Editorial background grid texture ---- */
+  --bg-grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M40 0H0V40H40V0ZM39 1H1V39H39V1Z' fill='%236366f1' fill-opacity='0.05'/%3E%3C/svg%3E");
 }
 
 *,
@@ -57,7 +81,7 @@ html {
 }
 
 body {
-  font-family: var(--sans);
+  font-family: var(--body);
   background: var(--bg1);
   color: var(--t1);
   line-height: 1.65;
@@ -65,50 +89,59 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  letter-spacing: -0.01em;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse 70% 50% at 50% -10%, rgba(139, 92, 246, 0.1), transparent),
-    radial-gradient(ellipse 50% 40% at 85% 50%, rgba(59, 130, 246, 0.06), transparent),
-    radial-gradient(ellipse 50% 40% at 15% 80%, rgba(139, 92, 246, 0.05), transparent);
+  text-rendering: optimizeLegibility;
 }
 
 a {
-  color: var(--purple-light);
+  color: var(--purple);
   text-decoration: none;
 }
 
+/* Editorial headings: Inter black, very tight tracking, tight leading */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  line-height: 1.15;
-  font-weight: 700;
-  letter-spacing: -0.025em;
+  font-family: var(--serif);
+  line-height: 0.95;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--t1);
 }
 
+/* Text selection — indigo tint */
+::selection {
+  background: var(--brand-100);
+  color: var(--purple-dark);
+}
+
+::-moz-selection {
+  background: var(--brand-100);
+  color: var(--purple-dark);
+}
+
+/* Scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg1);
+  background: var(--bg2);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
+  background: rgba(79, 70, 229, 0.25);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--purple-dark);
+  background: rgba(79, 70, 229, 0.45);
+}
+
+/* Editorial background grid utility (used on hero) */
+.bg-grid {
+  background-image: var(--bg-grid);
 }

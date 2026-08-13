@@ -440,40 +440,10 @@ export default function Home() {
       <NavBar active="home" />
       <section className={styles.hero}>
         <div className={styles.heroInner}>
-          {/* Decorative SVG background — Legal themed, clearly visible */}
-          <div className={styles.heroBg} aria-hidden="true">
-            <svg className={styles.heroBgSvg} viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Large concentric circles — top right */}
-              <circle cx="700" cy="60" r="180" stroke="rgba(139,92,246,0.12)" strokeWidth="1" />
-              <circle cx="700" cy="60" r="130" stroke="rgba(139,92,246,0.08)" strokeWidth="1" />
-              <circle cx="700" cy="60" r="80" stroke="rgba(99,102,241,0.06)" strokeWidth="1" />
-              {/* Concentric circles — bottom left */}
-              <circle cx="80" cy="520" r="140" stroke="rgba(59,130,246,0.1)" strokeWidth="1" />
-              <circle cx="80" cy="520" r="90" stroke="rgba(59,130,246,0.07)" strokeWidth="1" />
-              {/* Legal scales silhouette — center right */}
-              <g transform="translate(660, 300)" opacity="0.06">
-                <line x1="0" y1="-50" x2="0" y2="50" stroke="#8b5cf6" strokeWidth="3" />
-                <line x1="-40" y1="-40" x2="40" y2="-40" stroke="#8b5cf6" strokeWidth="3" />
-                <path d="M-40,-40 L-55,-10 L-25,-10 Z" stroke="#8b5cf6" strokeWidth="2" fill="none" />
-                <path d="M40,-40 L25,-10 L55,-10 Z" stroke="#8b5cf6" strokeWidth="2" fill="none" />
-                <rect x="-15" y="50" width="30" height="6" rx="3" fill="#8b5cf6" />
-              </g>
-              {/* Subtle grid dots */}
-              {[120, 280, 440, 600].map(x => [150, 300, 450].map(y => (
-                <circle key={`${x}-${y}`} cx={x} cy={y} r="1.5" fill="rgba(139,92,246,0.08)" />
-              )))}
-              {/* Diagonal accent lines */}
-              <line x1="0" y1="200" x2="200" y2="0" stroke="rgba(139,92,246,0.06)" strokeWidth="1" />
-              <line x1="600" y1="600" x2="800" y2="400" stroke="rgba(59,130,246,0.06)" strokeWidth="1" />
-              {/* Floating geometric shapes */}
-              <rect x="50" y="120" width="20" height="20" rx="4" stroke="rgba(139,92,246,0.15)" strokeWidth="1" fill="none" transform="rotate(20 60 130)" />
-              <rect x="720" y="440" width="28" height="28" rx="6" stroke="rgba(59,130,246,0.12)" strokeWidth="1" fill="none" transform="rotate(-15 734 454)" />
-              <circle cx="380" cy="520" r="8" stroke="rgba(139,92,246,0.1)" strokeWidth="1" fill="none" />
-              <circle cx="180" cy="60" r="5" fill="rgba(59,130,246,0.08)" />
-            </svg>
+          <div className={styles.heroTag}>
+            <span className={styles.heroPing}></span>
+            <span>AI-Powered Legal Intelligence</span>
           </div>
-
-          <div className={styles.heroTag}>{I("Shield")} AI-Powered Legal Intelligence</div>
           <h1 className={styles.heroH1}>Predict Your Case<br /><span className={styles.gold}>Outcome with AI</span></h1>
           <p className={styles.heroP}>Leverage insights from <strong>1.2 million+</strong> Indian court judgments. Get win probability, winning arguments, strategic timelines, and expert counsel — in seconds.</p>
           <div className={styles.heroBtns}>
@@ -488,11 +458,10 @@ export default function Home() {
       </section>
 
       {/* Decorative section divider */}
-      <div className={styles.sectionDivider}>
-        <svg viewBox="0 0 1200 2" fill="none"><line x1="0" y1="1" x2="1200" y2="1" stroke="url(#divGrad)" strokeWidth="1" /><defs><linearGradient id="divGrad" x1="0" y1="0" x2="1200" y2="0"><stop offset="0" stopColor="transparent" /><stop offset="0.5" stopColor="rgba(139,92,246,0.25)" /><stop offset="1" stopColor="transparent" /></linearGradient></defs></svg>
-      </div>
+      <hr style={{ border: "none", borderTop: "1px solid var(--border)", margin: "0 auto", maxWidth: "800px" }} />
 
       <section className={styles.section}>
+        <span className={styles.secLabel}>How It Works</span>
         <h2 className={styles.secTitle}>How NyayBase Works</h2>
         <div className={styles.grid4}>
           {[["Search", "Input Case Details", "Enter your case type, key facts, jurisdiction, and relevant legal sections for precise analysis."],
@@ -500,16 +469,15 @@ export default function Home() {
           ["Book", "Strategic Insights", "Receive win probability, winning arguments, case timeline, and landmark case precedents."],
           ["Clock", "Save Years of Effort", "Make informed legal decisions before investing time and resources in lengthy litigation."]
           ].map(([ic, t, d], i) => (
-            <div key={i} className={styles.card}><div className={styles.cardIcon}>{I(ic)}</div><h3>{t}</h3><p>{d}</p></div>
+            <div key={i} className={styles.card}><div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}><div className={styles.cardIcon} style={{ margin: 0 }}>{I(ic)}</div><h3 style={{ margin: 0 }}>{t}</h3></div><p>{d}</p></div>
           ))}
         </div>
       </section>
 
-      <div className={styles.sectionDivider}>
-        <svg viewBox="0 0 1200 2" fill="none"><line x1="0" y1="1" x2="1200" y2="1" stroke="url(#divGrad2)" strokeWidth="1" /><defs><linearGradient id="divGrad2" x1="0" y1="0" x2="1200" y2="0"><stop offset="0" stopColor="transparent" /><stop offset="0.5" stopColor="rgba(148,163,184,0.15)" /><stop offset="1" stopColor="transparent" /></linearGradient></defs></svg>
-      </div>
+      <hr style={{ border: "none", borderTop: "1px solid var(--border)", margin: "0 auto", maxWidth: "800px" }} />
 
       <section className={styles.section}>
+        <span className={styles.secLabel}>Case Categories</span>
         <h2 className={styles.secTitle}>Supported Case Types</h2>
         <div className={styles.grid3}>
           {(caseTypes.length > 0 ? caseTypes : Object.entries(ICON_MAP).map(([id]) => ({ id, name: id.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()), description: "", avg_win_rate: 0, avg_duration_months: 0 }))).filter(c => c.id !== "custom").map((ct, i) => (
@@ -530,10 +498,8 @@ export default function Home() {
       <section className={styles.trustSection}>
         <div className={styles.trustInner}>
           <div className={styles.trustItem}>{I("Shield")} <span>Data Encrypted & Secure</span></div>
-          <div className={styles.trustDot}></div>
-          <div className={styles.trustItem}>{I("Lock")} <span>No Data Stored</span></div>
-          <div className={styles.trustDot}></div>
-          <div className={styles.trustItem}>{I("Award")} <span>AI-Verified Analysis</span></div>
+                    <div className={styles.trustItem}>{I("Lock")} <span>No Data Stored</span></div>
+                    <div className={styles.trustItem}>{I("Award")} <span>AI-Verified Analysis</span></div>
         </div>
       </section>
 
@@ -686,22 +652,22 @@ export default function Home() {
           <>
             {/* Highlight Cards */}
             <div className={styles.grid4} style={{ marginBottom: 32 }}>
-              <div className={styles.statCard} style={{ borderTop: "3px solid #ef4444" }}>
+              <div className={styles.statCard}>
                 <div className={styles.statCardValue} style={{ color: "#ef4444" }}>{fmtNum(stats.highlights.total_pending)}</div>
                 <div className={styles.statCardLabel}>Total Pending Cases</div>
                 <div className={styles.muted} style={{ fontSize: 12 }}>Across Supreme Court + High Courts</div>
               </div>
-              <div className={styles.statCard} style={{ borderTop: "3px solid #f59e0b" }}>
+              <div className={styles.statCard}>
                 <div className={styles.statCardValue} style={{ color: "#f59e0b" }}>{stats.highlights.total_judges_working}</div>
                 <div className={styles.statCardLabel}>Working Judges</div>
                 <div className={styles.muted} style={{ fontSize: 12 }}>{stats.highlights.judge_vacancy} vacancies of {stats.highlights.total_judges_sanctioned} sanctioned</div>
               </div>
-              <div className={styles.statCard} style={{ borderTop: "3px solid #22c55e" }}>
+              <div className={styles.statCard}>
                 <div className={styles.statCardValue} style={{ color: "#22c55e" }}>{fmtNum(stats.highlights.annual_cases_disposed)}</div>
                 <div className={styles.statCardLabel}>Cases Disposed / Year</div>
                 <div className={styles.muted} style={{ fontSize: 12 }}>{fmtNum(stats.highlights.annual_cases_filed)} new cases filed annually</div>
               </div>
-              <div className={styles.statCard} style={{ borderTop: "3px solid #3b82f6" }}>
+              <div className={styles.statCard}>
                 <div className={styles.statCardValue} style={{ color: "#3b82f6" }}>{stats.highlights.courts_covered}</div>
                 <div className={styles.statCardLabel}>Courts Covered</div>
                 <div className={styles.muted} style={{ fontSize: 12 }}>Supreme Court + {stats.highlights.courts_covered - 1} High Courts</div>
