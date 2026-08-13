@@ -484,6 +484,7 @@
 .contactLink img {
   width: 14px;
   height: 14px;
+  filter: brightness(0) invert(1);
 }
 
 /* Buttons — large editorial CTAs */
@@ -556,6 +557,7 @@
 .btnPrimary img {
   width: 16px;
   height: 16px;
+  filter: brightness(0) invert(1);
 }
 
 .btnPrimary:active {
@@ -2374,6 +2376,7 @@
 .chatFabIcon {
   width: 24px;
   height: 24px;
+  filter: brightness(0) invert(1);
 }
 
 @keyframes chatPulse {
@@ -2712,6 +2715,7 @@
 .chatSendIcon {
   width: 16px;
   height: 16px;
+  filter: brightness(0) invert(1);
 }
 
 /* Responsive */

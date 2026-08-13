@@ -14,11 +14,11 @@ const Icons = {
   Shield: Ico("shield"),
   Clock: Ico("clock"),
   Book: Ico("book-open"),
-  Alert: Ico("alert-triangle"),
+  Alert: Ico("triangle-alert"),
   Check: Ico("check"),
   ArrowLeft: Ico("arrow-left"),
   ChevRight: Ico("chevron-right"),
-  Home: Ico("home"),
+  Home: Ico("house"),
   FileText: Ico("file-text"),
   Car: Ico("truck"),
   Heart: Ico("heart"),
@@ -32,7 +32,7 @@ const Icons = {
   Map: Ico("map-pin"),
   Layers: Ico("layers"),
   Settings: Ico("settings"),
-  BarChart: Ico("bar-chart-3"),
+  BarChart: Ico("chart-bar-big"),
   TrendingUp: Ico("trending-up"),
   Award: Ico("award"),
   MessageCircle: Ico("message-circle"),
@@ -452,10 +452,6 @@ export default function Home() {
           <div className={styles.heroBtns}>
             <button className={styles.btnPrimary} onClick={goToForm}>{I("Search")} Analyze Your Case</button>
             <button className={styles.btnSecondary} onClick={() => setView("stats")}>{I("BarChart")} View Statistics</button>
-          </div>
-          <div className={styles.statsBar}>
-            <div className={styles.stat}><div className={styles.statV}>25+</div><div className={styles.statL}>Courts Covered All Over India</div></div>
-            <div className={styles.stat}><div className={styles.statV}>Multiple</div><div className={styles.statL}>Case Types Analysed & Covered</div></div>
           </div>
         </div>
       </section>
