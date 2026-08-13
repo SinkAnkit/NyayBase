@@ -294,13 +294,13 @@ export default function Home() {
     if (!results) return;
     const wp = results.win_probability || {};
     let html = `<html><head><meta charset="utf-8"><title>NyayBase Report - ${results.case_type}</title>
-    <style>body{font-family:'Segoe UI',Tahoma,sans-serif;max-width:800px;margin:0 auto;padding:40px;color:#1a1a2e;line-height:1.6}
-    h1{color:#6d28d9;border-bottom:3px solid #6d28d9;padding-bottom:10px}h2{color:#4338ca;margin-top:30px;border-bottom:1px solid #e5e7eb;padding-bottom:6px}
+    <style>body{font-family:'Inter','Segoe UI',Tahoma,sans-serif;max-width:800px;margin:0 auto;padding:40px;color:#111827;line-height:1.6}
+    h1{color:#059669;border-bottom:3px solid #059669;padding-bottom:10px}h2{color:#047857;margin-top:30px;border-bottom:1px solid #e5e7eb;padding-bottom:6px}
     .badge{display:inline-block;padding:4px 12px;border-radius:12px;font-size:13px;font-weight:700;margin:4px}
     .green{background:#dcfce7;color:#166534}.red{background:#fee2e2;color:#991b1b}.amber{background:#fef3c7;color:#92400e}
-    .prob-box{text-align:center;padding:24px;margin:20px 0;background:#f5f3ff;border-radius:16px;border:2px solid #6d28d9}
-    .prob-num{font-size:56px;font-weight:800;color:#6d28d9}.prob-str{font-size:18px;color:#4338ca;font-weight:600}
-    .arg{background:#f8fafc;border-left:4px solid #6d28d9;padding:12px 16px;margin:10px 0;border-radius:0 8px 8px 0}
+    .prob-box{text-align:center;padding:24px;margin:20px 0;background:#ecfdf5;border-radius:16px;border:2px solid #059669}
+    .prob-num{font-size:56px;font-weight:800;color:#059669}.prob-str{font-size:18px;color:#047857;font-weight:600}
+    .arg{background:#f8fafc;border-left:4px solid #059669;padding:12px 16px;margin:10px 0;border-radius:0 8px 8px 0}
     .risk{background:#fef2f2;border-left:4px solid #ef4444;padding:12px 16px;margin:10px 0;border-radius:0 8px 8px 0}
     table{width:100%;border-collapse:collapse;margin:10px 0}td,th{padding:8px 12px;text-align:left;border-bottom:1px solid #e5e7eb}
     .footer{margin-top:40px;padding-top:20px;border-top:2px solid #e5e7eb;text-align:center;color:#6b7280;font-size:12px}</style></head><body>`;
@@ -668,7 +668,7 @@ export default function Home() {
                 <div className={styles.muted} style={{ fontSize: 12 }}>{fmtNum(stats.highlights.annual_cases_filed)} new cases filed annually</div>
               </div>
               <div className={styles.statCard}>
-                <div className={styles.statCardValue} style={{ color: "#3b82f6" }}>{stats.highlights.courts_covered}</div>
+                <div className={styles.statCardValue} style={{ color: "#059669" }}>{stats.highlights.courts_covered}</div>
                 <div className={styles.statCardLabel}>Courts Covered</div>
                 <div className={styles.muted} style={{ fontSize: 12 }}>Supreme Court + {stats.highlights.courts_covered - 1} High Courts</div>
               </div>
@@ -807,7 +807,7 @@ export default function Home() {
 
   const COURT_TYPE_LABEL = { supreme_court: "Supreme Court", high_court: "High Court", district_court: "District Court", consumer_forum: "Consumer Forum" };
   const COURT_TYPE_STYLE = { supreme_court: styles.courtTypeSC, high_court: styles.courtTypeHC, district_court: styles.courtTypeDC, consumer_forum: styles.courtTypeCF };
-  const COURT_TYPE_COLOR = { supreme_court: "#eab308", high_court: "#8b5cf6", district_court: "#3b82f6", consumer_forum: "#22c55e" };
+  const COURT_TYPE_COLOR = { supreme_court: "#eab308", high_court: "#059669", district_court: "#0ea5e9", consumer_forum: "#22c55e" };
 
   const filteredCourts = courtsFilter === "all" ? courtsResults : courtsResults.filter(c => c.type === courtsFilter);
 
@@ -852,7 +852,7 @@ export default function Home() {
       const bounds = [];
       filteredCourts.forEach((court) => {
         if (!court.lat || !court.lng) return;
-        const color = COURT_TYPE_COLOR[court.type] || "#8b5cf6";
+        const color = COURT_TYPE_COLOR[court.type] || "#059669";
         const marker = L.circleMarker([court.lat, court.lng], {
           radius: court.type === "supreme_court" ? 10 : court.type === "high_court" ? 8 : 6,
           fillColor: color,
@@ -1055,9 +1055,9 @@ export default function Home() {
   const filteredNews = newsFilter === "all" ? newsArticles : newsArticles.filter(a => a.category === newsFilter);
 
   const CATEGORY_COLORS = {
-    "Supreme Court": "#eab308", "High Court": "#8b5cf6", "Legislation": "#3b82f6",
+    "Supreme Court": "#eab308", "High Court": "#059669", "Legislation": "#0ea5e9",
     "Criminal": "#ef4444", "Property": "#22c55e", "Family Law": "#f472b6",
-    "Consumer": "#06b6d4", "Cyber Law": "#6366f1", "Tax": "#f59e0b", "Legal News": "#94a3b8",
+    "Consumer": "#06b6d4", "Cyber Law": "#047857", "Tax": "#f59e0b", "Legal News": "#94a3b8",
   };
 
   if (view === "news") renderView = (

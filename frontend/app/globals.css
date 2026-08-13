@@ -1,71 +1,70 @@
 /* ==========================================================================
-   NyayBase — Enterprise Editorial Design Tokens
-   White base · indigo-600 accent · Inter · dense editorial layout
+   NyayBase - Enterprise Editorial Design Tokens
+   White base, emerald accent, Inter, dense editorial layout
    ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 :root {
   /* ---- Backgrounds ---- */
-  --bg1: #ffffff;               /* page base (light)          */
-  --bg2: #f9fafb;               /* gray-50 subtle band        */
-  --bg-card: #f9fafb;           /* editorial cards on light   */
+  --bg1: #ffffff;
+  --bg2: #f9fafb;
+  --bg-card: #f9fafb;
   --bg-glass: rgba(255, 255, 255, 0.9);
 
   /* Dark section backgrounds (alternating bands) */
-  --bg-dark: #111827;           /* gray-900                   */
-  --bg-darker: #030712;         /* gray-950                   */
-  --bg-dark-card: #1f2937;      /* gray-800 (mockup frame)    */
-  --bg-dark-screen: #030712;    /* gray-950 (mockup screen)   */
+  --bg-dark: #111827;
+  --bg-darker: #030712;
+  --bg-dark-card: #1f2937;
+  --bg-dark-screen: #030712;
 
-  /* ---- Brand — Indigo ---- */
-  --purple: #4f46e5;            /* indigo-600 (primary brand) */
-  --purple-light: #6366f1;      /* indigo-500                 */
-  --purple-dark: #4338ca;       /* indigo-700 (hover)         */
-  --purple-glow: rgba(79, 70, 229, 0.08);
-  --brand-100: #e0e7ff;         /* indigo-100                 */
-  --brand-50: #eef2ff;          /* indigo-50                  */
+  /* ---- Brand - Emerald ---- */
+  --purple: #059669;            /* emerald-600 (primary brand) */
+  --purple-light: #10b981;      /* emerald-500                 */
+  --purple-dark: #047857;       /* emerald-700 (hover)         */
+  --purple-glow: rgba(5, 150, 105, 0.08);
+  --brand-100: #d1fae5;         /* emerald-100                 */
+  --brand-50: #ecfdf5;          /* emerald-50                  */
 
-  /* Accent kept in the indigo family (monochrome editorial) */
-  --accent: #4f46e5;
-  --accent-light: #6366f1;
-  --accent-glow: rgba(79, 70, 229, 0.10);
+  /* Accent - same emerald family */
+  --accent: #059669;
+  --accent-light: #10b981;
+  --accent-glow: rgba(5, 150, 105, 0.10);
 
-  /* Blue — mapped to indigo for cohesion */
-  --blue: #4f46e5;
-  --blue-light: #6366f1;
-  --blue-dark: #4338ca;
+  /* Blue - mapped to emerald for cohesion */
+  --blue: #059669;
+  --blue-light: #10b981;
+  --blue-dark: #047857;
 
-  /* Accent gradient — removed per design guidelines (no gradients) */
   --accent-gradient: none;
 
   /* ---- Typography colors (dark on light) ---- */
-  --t1: #111827;                /* gray-900 headings          */
-  --t2: #4b5563;                /* gray-600 body              */
-  --t3: #6b7280;                /* gray-500 muted             */
-  --t4: #9ca3af;                /* gray-400 faint             */
+  --t1: #111827;
+  --t2: #4b5563;
+  --t3: #6b7280;
+  --t4: #9ca3af;
 
   /* ---- Borders ---- */
-  --border: #f3f4f6;            /* gray-100                   */
-  --border-accent: rgba(79, 70, 229, 0.25);
+  --border: #f3f4f6;
+  --border-accent: rgba(5, 150, 105, 0.25);
 
   /* ---- Semantic ---- */
   --green: #16a34a;
   --amber: #d97706;
   --red: #dc2626;
 
-  /* ---- Fonts (Inter everywhere; headlines use black weight) ---- */
+  /* ---- Fonts ---- */
   --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --body: var(--sans);
 
-  /* ---- Editorial shadows (colored on light) ---- */
+  /* ---- Editorial shadows (emerald-tinted on light) ---- */
   --shadow-card: 0 1px 2px rgba(17, 24, 39, 0.04);
-  --shadow-hover: 0 30px 60px -15px rgba(79, 70, 229, 0.18);
+  --shadow-hover: 0 30px 60px -15px rgba(5, 150, 105, 0.15);
   --shadow-cta: 0 20px 40px -12px rgba(17, 24, 39, 0.35);
-  --shadow-indigo: 0 12px 30px -8px rgba(79, 70, 229, 0.35);
+  --shadow-brand: 0 12px 30px -8px rgba(5, 150, 105, 0.30);
 
-  /* ---- Editorial background grid texture ---- */
-  --bg-grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M40 0H0V40H40V0ZM39 1H1V39H39V1Z' fill='%236366f1' fill-opacity='0.05'/%3E%3C/svg%3E");
+  /* ---- Background grid texture (emerald tint) ---- */
+  --bg-grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M40 0H0V40H40V0ZM39 1H1V39H39V1Z' fill='%23059669' fill-opacity='0.04'/%3E%3C/svg%3E");
 }
 
 *,
@@ -98,7 +97,6 @@ a {
   text-decoration: none;
 }
 
-/* Editorial headings: Inter black, very tight tracking, tight leading */
 h1,
 h2,
 h3,
@@ -112,7 +110,7 @@ h6 {
   color: var(--t1);
 }
 
-/* Text selection — indigo tint */
+/* Text selection - emerald tint */
 ::selection {
   background: var(--brand-100);
   color: var(--purple-dark);
@@ -134,15 +132,10 @@ h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(79, 70, 229, 0.25);
+  background: rgba(5, 150, 105, 0.25);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(79, 70, 229, 0.45);
-}
-
-/* Editorial background grid utility (used on hero) */
-.bg-grid {
-  background-image: var(--bg-grid);
+  background: rgba(5, 150, 105, 0.45);
 }
