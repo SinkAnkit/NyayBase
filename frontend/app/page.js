@@ -498,7 +498,7 @@ export default function Home() {
         <div className={styles.trustInner}>
           <div className={styles.trustItem}>{I("Shield")} <span>Data Encrypted & Secure</span></div>
                     <div className={styles.trustItem}>{I("Lock")} <span>No Data Stored</span></div>
-                    <div className={styles.trustItem}>{I("Award")} <span>AI-Verified Analysis</span></div>
+                    <div className={styles.trustItem}>{I("Award")} <span>Verified Case Data</span></div>
         </div>
       </section>
 
