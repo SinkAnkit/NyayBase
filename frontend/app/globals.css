@@ -35,7 +35,8 @@
   --blue-light: #6366f1;
   --blue-dark: #4338ca;
 
-  --accent-gradient: linear-gradient(135deg, #4f46e5, #6366f1);
+  /* Accent gradient — removed per design guidelines (no gradients) */
+  --accent-gradient: none;
 
   /* ---- Typography colors (dark on light) ---- */
   --t1: #111827;                /* gray-900 headings          */
