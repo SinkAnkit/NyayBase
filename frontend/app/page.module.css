@@ -2897,19 +2897,25 @@
 /* ===== Case History ===== */
 .historySection {
   max-width: 900px;
-  margin: 20px auto 50px;
-  padding: 0 24px;
+  margin: 0 auto;
+  padding: 64px 24px;
+  background: var(--bg-dark);
 }
 
 .historySection h3 {
-  font-size: clamp(24px, 4vw, 40px);
-  color: var(--t1);
+  font-size: clamp(20px, 3vw, 28px);
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 28px;
   display: flex;
   align-items: center;
   gap: 10px;
   font-weight: 900;
   letter-spacing: -0.04em;
+}
+
+.historySection h3 img {
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
 }
 
 .historyGrid {
@@ -2919,8 +2925,8 @@
 }
 
 .historyCard {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 1.5rem;
   padding: 24px;
   cursor: pointer;
@@ -2928,10 +2934,9 @@
 }
 
 .historyCard:hover {
-  border-color: var(--border);
-  background: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
 }
 
 .historyCardTop {
@@ -2944,7 +2949,7 @@
 .historyType {
   font-size: 14px;
   font-weight: 600;
-  color: var(--t1);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .historyProb {
@@ -2956,13 +2961,13 @@
 
 .historyDate {
   font-size: 11px;
-  color: var(--t4);
+  color: rgba(255, 255, 255, 0.4);
   margin-top: 8px;
 }
 
 .historyJur {
   font-size: 12px;
-  color: var(--t3);
+  color: rgba(255, 255, 255, 0.5);
   margin-top: 6px;
   line-height: 1.4;
 }
@@ -2979,18 +2984,19 @@
   font-size: 11px;
   padding: 4px 10px;
   border-radius: 14px;
-  border: 1px solid var(--border);
-  background: rgba(5, 150, 105, 0.04);
-  color: var(--t3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   transition: all 0.2s;
   font-family: inherit;
+  font-weight: 500;
 }
 
 .suggestChip:hover {
-  background: rgba(5, 150, 105, 0.1);
-  border-color: var(--accent);
-  color: var(--t1);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* ═══════════════════════════════════════ */
