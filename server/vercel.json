@@ -7,8 +7,15 @@
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "main.py"
+    },
+    {
       "src": "/(.*)",
       "dest": "main.py"
     }
-  ]
+  ],
+  "env": {
+    "VERCEL": "1"
+  }
 }

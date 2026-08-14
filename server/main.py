@@ -75,13 +75,18 @@ def _keep_alive():
 
 @asynccontextmanager
 async def lifespan(app):
-    # Startup: build RAG index in background thread
-    print("[NyayBase] Starting RAG index build in background...")
-    t = threading.Thread(target=_build_index_background, daemon=True)
-    t.start()
-    # Start keep-alive self-ping for Render
-    ka = threading.Thread(target=_keep_alive, daemon=True)
-    ka.start()
+    # Skip background threads on Vercel (serverless)
+    if not os.environ.get("VERCEL"):
+        # Startup: build RAG index in background thread
+        print("[NyayBase] Starting RAG index build in background...")
+        t = threading.Thread(target=_build_index_background, daemon=True)
+        t.start()
+        # Start keep-alive self-ping for Render
+        ka = threading.Thread(target=_keep_alive, daemon=True)
+        ka.start()
+    else:
+        print("[NyayBase] Running on Vercel serverless, skipping background threads")
+        _build_index_background()
     yield
     # Shutdown: nothing to clean up
 
