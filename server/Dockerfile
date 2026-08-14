@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose port
-EXPOSE 8000
+EXPOSE 7860
 
-# Run with gunicorn — use $PORT from Railway/Render, default 8000
-CMD gunicorn main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:${PORT:-8000} --workers 1 --timeout 120
+# Run with gunicorn — use $PORT from platform, default 7860 (HuggingFace Spaces)
+CMD gunicorn main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:${PORT:-7860} --workers 1 --timeout 120
